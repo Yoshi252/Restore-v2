@@ -1,4 +1,7 @@
 using System;
+using System.Threading.Tasks;
+using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
@@ -14,13 +17,40 @@ public class Dbinitializer
         //Gives us access to the StoreContext
         var context = scope.ServiceProvider.GetRequiredService<StoreContext>()
             ?? throw new InvalidOperationException("Failed to retrieve store context");
+        // This was Basically copied from the contect variable
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>()
+            ?? throw new InvalidOperationException("Failed to retrieve User Manager");
 
-        SeedData(context);
+        SeedData(context, userManager);
     }
 
-    private static void SeedData(StoreContext context)
+    private static async void SeedData(StoreContext context, UserManager<User> userManager)
     {
         context.Database.Migrate();
+
+        // Check to see if we have users in our database if not we will seed some
+        if (!userManager.Users.Any())
+        {
+            var user = new User
+            {
+                UserName = "bob@test.com",
+                Email = "bob@test.com"
+            };
+
+            //Password has to be conplex
+            await userManager.CreateAsync(user, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(user, "Member");
+
+            var admin = new User
+            {
+                UserName = "admin@test.com",
+                Email = "admin@test.com"
+            };
+
+            //Password has to be conplex
+            await userManager.CreateAsync(admin, "Pa$$w0rd");
+            await userManager.AddToRolesAsync(admin, ["Member", "Admin"]);
+        }
 
         if (context.Products.Any()) return;
 

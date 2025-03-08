@@ -12,8 +12,6 @@ export default function Catalog() {
   const {data: filtersData, isLoading: filtersLoading} = useFetchFiltersQuery();
   const dispatch = useAppDispatch();
 
-  console.log('data:', data);
-
   if (isLoading || !data || filtersLoading || !filtersData) return <div>Loading...</div>
 
   return (

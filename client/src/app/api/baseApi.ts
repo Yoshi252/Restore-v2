@@ -19,7 +19,7 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
         const result = await customBaseQuery(args, api, extraOptions);
         api.dispatch(stopLoading())
         if (result.error) {
-            console.log(result.error);
+            console.log('error:', result);
 
             const originalStatus = result.error.status === 'PARSING_ERROR' && result.error.originalStatus
                 ? result.error.originalStatus
