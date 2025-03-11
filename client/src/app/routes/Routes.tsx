@@ -11,16 +11,17 @@ import CheckoutPage from "../../features/checkout/checkoutPage";
 import LoginForm from "../../features/account/LoginForm";
 import RegisterForm from "../../lib/schemas/RegisterForm";
 import RequireAuth from "./RequireAuth";
+import CheckoutSuccess from "../../features/checkout/CheckoutSuccess";
 
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
         children: [
-            {element: <RequireAuth />, children: [
-                // Cut this from below
-                {path: '/checkout', element: <CheckoutPage /> },
-            ]},
+{element: <RequireAuth />, children: [
+    {path: '/checkout', element: <CheckoutPage /> },
+    {path: '/checkout/success', element: <CheckoutSuccess /> },
+]},
             {path: '', element: <HomePage/> },
             {path: '/catalog', element: <Catalog />},
             {path: '/catalog/:id', element: <ProductDetails/> },
