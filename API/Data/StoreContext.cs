@@ -1,5 +1,6 @@
 using System;
 using API.Entities;
+using API.Entities.OrderAggregate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +10,8 @@ namespace API.Data;
 public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options)
 {
     public required DbSet<Product> Products {get; set;} 
-
     public required DbSet<Basket> Baskets { get; set; }
+    public DbSet<Order> Orders { get; set; }
 
     // Just write override on, to get the short cut
     protected override void OnModelCreating(ModelBuilder builder)
