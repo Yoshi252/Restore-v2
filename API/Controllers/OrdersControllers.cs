@@ -12,13 +12,13 @@ using Microsoft.EntityFrameworkCore;
 namespace API.controllers;
 
 [Authorize]
-public class OrdersControllers(StoreContext context) : BaseApiController
+public class OrdersController(StoreContext context) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<Order>>> GetOrders()
+    public async Task<ActionResult<List<OrderDto>>> GetOrders()
     {
         var orders = await context.Orders
-            .Include(x => x.OrderItems)
+            .ProjetToDto()
             .Where(x => x.BuyerEmail == User.GetUserName())
             .ToListAsync();
 
@@ -26,9 +26,12 @@ public class OrdersControllers(StoreContext context) : BaseApiController
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Order>> GetOrderDetails(int id)
+    // Change this to a OrderDto Type
+    public async Task<ActionResult<OrderDto>> GetOrderDetails(int id)
     {
         var order = await context.Orders
+            // Add this , This let's us only select what we need to from the database
+            .ProjetToDto()
             .Where(x => x.BuyerEmail == User.GetUserName() && id == x.Id)
             .FirstOrDefaultAsync();
 
@@ -51,18 +54,30 @@ public class OrdersControllers(StoreContext context) : BaseApiController
         var subtotal = items.Sum(x => x.Price * x.Quantity);
         var deliveryFee = CalculateDeliveryFee(subtotal);
 
-        var order = new Order
-        {
-            OrderItems = items,
-            BuyerEmail = User.GetUserName(),
-            ShippingAddress = orderDto.ShippingAddress,
-            DeliveryFee = deliveryFee,
-            Subtotal = subtotal,
-            PaymentSummary = orderDto.PaymentSummary,
-            PaymentIntentId = basket.PaymentIntentId
-        };
+        var order = await context.Orders
+            .Include(x => x.OrderItems)
+            .FirstOrDefaultAsync(x => x.PaymentIntentId == basket.PaymentIntentId);
 
-        context.Orders.Add(order);
+        if (order == null) 
+        {
+            // Copy & paste these here
+            order = new Order
+            {
+                OrderItems = items,
+                BuyerEmail = User.GetUserName(),
+                ShippingAddress = orderDto.ShippingAddress,
+                DeliveryFee = deliveryFee,
+                Subtotal = subtotal,
+                PaymentSummary = orderDto.PaymentSummary,
+                PaymentIntentId = basket.PaymentIntentId
+            };
+
+            context.Orders.Add(order);
+        }
+        else
+        {
+            order.OrderItems = items;
+        }
 
         context.Baskets.Remove(basket);
         Response.Cookies.Delete("basketId");
@@ -71,7 +86,7 @@ public class OrdersControllers(StoreContext context) : BaseApiController
 
         if (!result) return BadRequest("Problem creating order");
 
-        return CreatedAtAction(nameof(GetOrderDetails), new {id = order.Id}, order);
+        return CreatedAtAction(nameof(GetOrderDetails), new {id = order.Id}, order.ToDto());
     }
     
     private long CalculateDeliveryFee(long subtotal)
