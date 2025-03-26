@@ -8,7 +8,7 @@ namespace API.Data;
 
 public class Dbinitializer
 {
-    public static void InitDb(WebApplication app)
+    public static async Task InitDb(WebApplication app)
     {
         // Gives us access to the services
         // Anything we us inside scope will be disposed of by the framework when done using
@@ -21,10 +21,10 @@ public class Dbinitializer
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>()
             ?? throw new InvalidOperationException("Failed to retrieve User Manager");
 
-        SeedData(context, userManager);
+        await SeedData(context, userManager);
     }
 
-    private static async void SeedData(StoreContext context, UserManager<User> userManager)
+    private static async Task SeedData(StoreContext context, UserManager<User> userManager)
     {
         context.Database.Migrate();
 

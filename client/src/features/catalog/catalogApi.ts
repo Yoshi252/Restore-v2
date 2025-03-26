@@ -1,9 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { Product } from "../../app/models/product";
-import { baseQueryWithErrorHandling } from "../../app/api/baseApi";
 import { ProductParams } from "../../app/models/productParams";
 import { filterEmptyValues } from "../../lib/util";
 import { Pagination } from "../../app/models/Pagination";
+import { baseQueryWithErrorHandling } from "../../app/api/baseApi";
+
 
 export const catalogApi = createApi({
     reducerPath: 'catalogApi',
