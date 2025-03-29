@@ -22,10 +22,10 @@ export const orderApi = createApi({
                 method: 'POST',
                 body: order
             }),  
-            onQueryStarted: async (_, {dispatch, queryFulfilled}) => {
-                await queryFulfilled,
-                dispatch(orderApi.util.invalidateTags(['Orders']))
-            }
+            // onQueryStarted: async (_, {dispatch, queryFulfilled}) => {
+            //     await queryFulfilled,
+            //     dispatch(orderApi.util.invalidateTags(['Orders']))
+            // }
         })
     })
 })

@@ -37,7 +37,7 @@ export default function HomePage() {
             textAlign='center'
             sx={{my:3}}
           >
-            This is the Home Page!
+            This is the Home Page!!
           </Typography>
           <Button
             variant="contained"
